@@ -1,0 +1,7 @@
+{
+  "name": "stack-overflow-tracker-chrome",
+  "version": "0.0.1",
+  "dependencies": {
+    "fetch": "0.10.x"
+  }
+}

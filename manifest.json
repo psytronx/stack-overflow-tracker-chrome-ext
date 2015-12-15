@@ -1,0 +1,15 @@
+{
+  "name": "Stack Overflow Tracker",
+  "version": "0.0.1",
+  "manifest_version": 2,
+  "description" : "Track which pages I visit on Stack Overflow site.",
+  "background": {
+    "scripts": ["background.js"],
+    "persistent": false
+  },
+  "content_scripts": [{
+    "matches": ["http://stackoverflow.com/questions/*", "https://stackoverflow.com/questions/*"],
+    "js": ["content.js"],
+    "run_at": "document_end"
+  }]
+}
