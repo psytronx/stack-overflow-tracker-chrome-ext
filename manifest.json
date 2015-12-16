@@ -2,6 +2,7 @@
   "name": "Stack Overflow Tracker",
   "version": "0.0.1",
   "manifest_version": 2,
+  "minimum_chrome_version": "32",
   "description" : "Track which pages I visit on Stack Overflow site.",
   "background": {
     "scripts": ["background.js"],
@@ -11,5 +12,8 @@
     "matches": ["http://stackoverflow.com/questions/*", "https://stackoverflow.com/questions/*"],
     "js": ["content.js"],
     "run_at": "document_end"
-  }]
+  }],
+  "permissions": [
+    "https://api.stackexchange.com/"
+  ]
 }
