@@ -10,10 +10,12 @@
   },
   "content_scripts": [{
     "matches": ["http://stackoverflow.com/questions/*", "https://stackoverflow.com/questions/*"],
-    "js": ["content.js"],
+    "js": ["bower_components/tv4/tv4.js","content.js"],
     "run_at": "document_end"
   }],
   "permissions": [
-    "https://api.stackexchange.com/"
+    "https://api.stackexchange.com/",
+    "http://localhost:3000/",
+    "http://stormy-garden-5557.herokuapp.com/"
   ]
 }

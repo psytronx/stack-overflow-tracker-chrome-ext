@@ -20,21 +20,25 @@
     ]
  }
  */
+(function (){
 
-(function main() {
+    const sotrackerHost = "http://localhost:3000/";
 
-    window.addEventListener('load', function onLoad() {
-        console.log('Hello, world.');
-        getStackOverflowPageInfo().then(function(info){
+    (function main() {
 
-            console.log('info: ', info);
+        window.addEventListener('load', function onLoad() {
+            console.log('Hello, world.');
+            getStackOverflowPageInfo()
+                .then(prlogResult('pageInfo: '))
+                .then(sendPageInfoToSotrackerApi)
+                .then(prlog('Page info successfully posted to sotracker API.'))
+                .catch(function (err){
+                    console.error(err);
+                    alertUserStackExchangeApiError();
+                });
+            });
 
-        }).catch(function(err){
-
-            alertUserStackExchangeApiError();
-
-        });
-    });
+    })();
 
     // Fetch relevant page data.
     // Returns Promise
@@ -46,15 +50,16 @@
         info.url = window.location.href;
         info.path = window.location.pathname;
         info.questionId = info.path.split('/')[2];
+        info.questionId = parseInt(info.questionId);
 
         var stackExchangeApiQuestionUrl = 'https://api.stackexchange.com/2.2/questions/' + info.questionId + '/?site=stackoverflow&filter=withbody',
             questionPromise = window.fetch(stackExchangeApiQuestionUrl)
-            .then(checkStatus)
-            .then(getJsonFromResponse)
-            .then(fetchedQuestion);
+                .then(checkStatus)
+                .then(getJsonFromResponse)
+                .then(fetchedQuestion);
 
         var stackExchangeApiAnswersUrl = 'https://api.stackexchange.com/2.2/questions/' + info.questionId + '/answers?order=desc&sort=activity&site=stackoverflow&filter=withbody';
-            answersPromise = window.fetch(stackExchangeApiAnswersUrl)
+        answersPromise = window.fetch(stackExchangeApiAnswersUrl)
             .then(checkStatus)
             .then(getJsonFromResponse)
             .then(fetchedAnswers);
@@ -108,6 +113,38 @@
 
     }
 
+    function sendPageInfoToSotrackerApi(info) {
+
+        // Validation
+        var pageInfoSchema = {
+            "url": "string",
+            "path": "string",
+            "questionId": "string",
+            "bestAnswerId": "string",
+            "bestAnswer": "string",
+            "bestAnswerCreationDate":"number",
+            "bestAnswerScore":"string",
+            "title":"string",
+            "question":"string",
+            "creationDate":"number",
+            "tags":"array"
+        };
+        if (!tv4.validate(info, pageInfoSchema)) {
+            throw new Error(JSON.stringify(tv4.error, null, 4));
+        }
+
+        // Send page info
+        return fetch(sotrackerHost + 'sotracker/views/?login=psytronx', {
+            method:'POST',
+            body:JSON.stringify(info)
+        }).then(function(res){
+            if (!res.ok){
+                throw new Error(JSON.stringify(res));
+            }
+            return res;
+        })
+    }
+
     /* Helper Functions */
 
     function checkStatus(response) {
@@ -128,5 +165,19 @@
         window.alert('Stack Overflow Tracker: Our apologies - there was an error analyzing this page. Please try refreshing the page or visiting it later.');
     }
 
-})();
+    // Returns function that calls console.log for result and then returns result for next step in promise chain.
+    function prlog(message){
+        return function(result){
+            console.log(message);
+            return result;
+        };
+    }
+    // Same as above function, and also appends result to message passed into console.log.
+    function prlogResult(message){
+        return function(result){
+            console.log(message, result);
+            return result;
+        };
+    }
 
+})();
