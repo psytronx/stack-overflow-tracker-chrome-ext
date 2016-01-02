@@ -53,24 +53,25 @@
         info.questionId = parseInt(info.questionId);
 
         var stackExchangeApiQuestionUrl = 'https://api.stackexchange.com/2.2/questions/' + info.questionId + '/?site=stackoverflow&filter=withbody',
-            questionPromise = window.fetch(stackExchangeApiQuestionUrl)
+            prQuestion = window.fetch(stackExchangeApiQuestionUrl)
                 .then(checkStatus)
                 .then(getJsonFromResponse)
                 .then(fetchedQuestion);
 
-        var stackExchangeApiAnswersUrl = 'https://api.stackexchange.com/2.2/questions/' + info.questionId + '/answers?order=desc&sort=activity&site=stackoverflow&filter=withbody';
-        answersPromise = window.fetch(stackExchangeApiAnswersUrl)
+        var stackExchangeApiAnswersUrl = 'https://api.stackexchange.com/2.2/questions/' + info.questionId + '/answers?order=desc&sort=activity&site=stackoverflow&filter=withbody',
+            prAnswers = window.fetch(stackExchangeApiAnswersUrl)
             .then(checkStatus)
             .then(getJsonFromResponse)
             .then(fetchedAnswers);
 
-        return Promise.all([questionPromise, answersPromise])
+        return Promise.all([prQuestion, prAnswers])
             .then(function(){
                 return info;
             });
 
         // Fetch question data
         function fetchedQuestion(data) {
+
             var question = data.items[0];
             if (data.quota_remaining <= 1){
                 console.log('Stack Exchange API quota exceeded.')
@@ -79,10 +80,12 @@
             info.question = question.body;
             info.creationDate = question.creation_date;
             info.tags = question.tags;
+
         }
 
         // Fetch data from accepted answer or answer with highest score
         function fetchedAnswers(data) {
+
             var answers = data.items,
                 maxAnswerScore = 0,
                 maxAnswerScoreIndex = 0;
@@ -109,6 +112,11 @@
                 info.bestAnswerCreationDate = answers[maxAnswerScoreIndex].creation_date;
                 info.bestAnswerScore = answers[maxAnswerScoreIndex].score;
             }
+
+            // Convert timestamps from seconds to milliseconds
+            info.bestAnswerCreationDate = info.bestAnswerCreationDate * 1000;
+            info.creationDate = info.creationDate * 1000;
+
         }
 
     }
