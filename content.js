@@ -22,7 +22,7 @@
  */
 (function (){
 
-    const sotrackerHost = "http://localhost:3000/";
+    const sotrackerHost = "https://agile-plains-3571.herokuapp.com/"; //"http://localhost:3000/";
 
     (function main() {
 

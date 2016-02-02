@@ -16,6 +16,6 @@
   "permissions": [
     "https://api.stackexchange.com/",
     "http://localhost:3000/",
-    "http://stormy-garden-5557.herokuapp.com/"
+    "https://agile-plains-3571.herokuapp.com/"
   ]
 }
